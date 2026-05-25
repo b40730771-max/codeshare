@@ -231,3 +231,8 @@ export default function MailPage() {
     </div>
   );
 }
+const btnStyle: React.CSSProperties = {
+  background: '#6366f1', color: '#fff', border: 'none',
+  padding: '10px 20px', borderRadius: '8px', cursor: 'pointer',
+  fontSize: '0.95rem', fontWeight: 600
+}
