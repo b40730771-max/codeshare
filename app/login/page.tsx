@@ -60,3 +60,14 @@ export default function LoginPage() {
     </div>
   );
 }
+const inputStyle: React.CSSProperties = {
+  background: '#1a1a1a', border: '1px solid #2a2a2a',
+  color: '#eee', padding: '10px 14px', borderRadius: '8px',
+  fontSize: '0.95rem', outline: 'none', width: '100%', boxSizing: 'border-box'
+}
+
+const btnStyle: React.CSSProperties = {
+  background: '#6366f1', color: '#fff', border: 'none',
+  padding: '10px', borderRadius: '8px', cursor: 'pointer',
+  fontSize: '1rem', fontWeight: 600
+}
