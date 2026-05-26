@@ -98,11 +98,14 @@ export default function PostPage() {
           <p style={{ color: '#888', margin: 0, fontSize: '0.875rem' }}>
             by {post.profiles?.username} · {new Date(post.created_at).toLocaleDateString('ko-KR')}
           </p>
-          {isOwner && (
-            <button onClick={() => router.push(`/post/${id}/edit`)} style={smallBtn}>
-              ✏️ 수정하기
-            </button>
-          )}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <button onClick={() => router.push(`/post/${id}/issues`)} style={smallBtn}>🐛 Issues</button>
+            <button onClick={() => router.push(`/post/${id}/pulls`)} style={smallBtn}>🔀 PR</button>
+            <button onClick={() => router.push(`/post/${id}/branches`)} style={smallBtn}>🌿 브랜치</button>
+            {isOwner && (
+              <button onClick={() => router.push(`/post/${id}/edit`)} style={smallBtn}>✏️ 수정하기</button>
+            )}
+          </div>
         </div>
         {post.description && <p style={{ marginTop: '1rem', color: '#ccc', lineHeight: 1.7 }}>{post.description}</p>}
       </div>
