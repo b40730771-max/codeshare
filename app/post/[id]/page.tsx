@@ -131,14 +131,39 @@ export default function PostPage() {
 
   const rollback = async (version: Version) => {
     if (!window.confirm(`v${version.version_number} "${version.commit_message}" 버전으로 롤백할까요?`)) return
-    const { error } = await supabase.from('posts').update({ code: version.code, title: version.title }).eq('id', id)
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    // 현재 버전을 히스토리에 저장
+    const { count } = await supabase
+      .from('post_versions')
+      .select('*', { count: 'exact', head: true })
+      .eq('post_id', id)
+
+    await supabase.from('post_versions').insert({
+      post_id: id,
+      user_id: user.id,
+      code: post!.code,
+      title: post!.title,
+      description: (post as any)?.description,
+      commit_message: `롤백 전 저장`,
+      version_number: (count || 0) + 1
+    })
+
+    // 롤백 실행
+    const { error } = await supabase.from('posts')
+      .update({ code: version.code, title: version.title })
+      .eq('id', id)
+
     if (error) { alert('롤백 실패: ' + error.message); return }
     window.location.reload()
   }
+
   if (!post) return <p style={{ color: 'var(--text-dim)' }}>불러오는 중...</p>
 
   const isOwner = !!myId && myId === post.user_id
-  
+
   return (
     <div style={{ maxWidth: '800px' }}>
       {/* 헤더 */}
@@ -151,7 +176,11 @@ export default function PostPage() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px', flexWrap: 'wrap' }}>
           <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.875rem' }}>
-            by {post.profiles?.username} · {new Date(post.created_at).toLocaleDateString('ko-KR')}
+            by{' '}
+            <a href={`/user/${post.profiles?.username}`} style={{ color: '#a5b4fc', textDecoration: 'none' }}>
+              {post.profiles?.username}
+            </a>
+            {' '}· {new Date(post.created_at).toLocaleDateString('ko-KR')}
           </p>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <button onClick={() => router.push(`/post/${id}/issues`)} style={smallBtn}>🐛 Issues</button>
@@ -162,7 +191,7 @@ export default function PostPage() {
             )}
           </div>
         </div>
-        {post.description && <p style={{ marginTop: '1rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>{post.description}</p>}
+        {post.description && <p style={{ marginTop: '1rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>{(post as any).description}</p>}
       </div>
 
       {/* 코드 */}
