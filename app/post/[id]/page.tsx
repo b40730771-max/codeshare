@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 import { supabase, Post, Comment } from '@/lib/supabase'
 import { useParams, useRouter } from 'next/navigation'
 import CodeBlock from '@/components/CodeBlock'
+import FileUpload from '@/components/FileUpload'
+import FileList from '@/components/FileList'
 
 type Version = {
   id: string
@@ -25,6 +27,7 @@ export default function PostPage() {
   const [myId, setMyId] = useState('')
   const [versions, setVersions] = useState<Version[]>([])
   const [showVersions, setShowVersions] = useState(false)
+  const [fileRefresh, setFileRefresh] = useState(0)
   const router = useRouter()
 
   useEffect(() => {
@@ -189,6 +192,25 @@ export default function PostPage() {
           </button>
         </div>
       </div>
+
+      {/* 첨부 파일 목록 */}
+      <FileList
+        postId={id}
+        isOwner={isOwner}
+        onRefresh={() => setFileRefresh(r => r + 1)}
+        key={fileRefresh}
+      />
+
+      {/* 파일 업로드 (본인만) */}
+      {isOwner && myId && (
+        <div style={{ marginBottom: '2rem' }}>
+          <FileUpload
+            postId={id}
+            userId={myId}
+            onUpload={() => setFileRefresh(r => r + 1)}
+          />
+        </div>
+      )}
 
       {/* 버전 히스토리 */}
       {versions.length > 0 && (
