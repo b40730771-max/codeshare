@@ -2,6 +2,7 @@
 import { Post } from '@/lib/supabase'
 import { supabase } from '@/lib/supabase'
 import { useState, useEffect } from 'react'
+import CodeBlock from '@/components/CodeBlock'
 
 export default function CodeCard({ post }: { post: Post }) {
   const [likes, setLikes] = useState(post.likes_count)
@@ -12,6 +13,18 @@ export default function CodeCard({ post }: { post: Post }) {
   useEffect(() => {
     const checkStatus = async () => {
       const { data: { user } } = await supabase.auth.getUser()
+
+      // 실제 카운트 DB에서 다시 가져오기
+      const { data: postData } = await supabase
+        .from('posts')
+        .select('likes_count, stars_count')
+        .eq('id', post.id)
+        .single()
+      if (postData) {
+        setLikes(postData.likes_count)
+        setStars(postData.stars_count || 0)
+      }
+
       if (!user) return
 
       const { data: like } = await supabase
@@ -71,18 +84,16 @@ export default function CodeCard({ post }: { post: Post }) {
     window.location.href = `/post/${post.id}`
   }
 
-  const preview = post.code.split('\n').slice(0, 3).join('\n')
-
   return (
     <div style={{
-      background: '#1a1a1a', border: '1px solid #2a2a2a',
+      background: 'var(--bg-card)', border: '1px solid var(--border)',
       borderRadius: '12px', padding: '1.25rem'
     }}>
       {/* 헤더 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
         <div>
-          <span style={{ color: '#eee', fontWeight: 600, fontSize: '1.05rem' }}>{post.title}</span>
-          <p style={{ margin: '4px 0 0', color: '#666', fontSize: '0.85rem' }}>
+          <span style={{ color: 'var(--text)', fontWeight: 600, fontSize: '1.05rem' }}>{post.title}</span>
+          <p style={{ margin: '4px 0 0', color: 'var(--text-dim)', fontSize: '0.85rem' }}>
             by {post.profiles?.username} · {new Date(post.created_at).toLocaleDateString('ko-KR')}
           </p>
         </div>
@@ -95,44 +106,37 @@ export default function CodeCard({ post }: { post: Post }) {
       </div>
 
       {/* 코드 미리보기 */}
-      <pre style={{
-        background: '#111', borderRadius: '8px', padding: '1rem',
-        overflowX: 'auto', fontSize: '0.8rem', color: '#ccc',
-        margin: '0 0 1rem', maxHeight: '80px', overflow: 'hidden'
-      }}>
-        <code>{preview}{post.code.split('\n').length > 3 ? '\n...' : ''}</code>
-      </pre>
+      <div style={{ marginBottom: '1rem' }}>
+        <CodeBlock code={post.code} language={post.language} preview />
+      </div>
 
       {/* 태그 + 버튼 */}
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
         {post.tags?.map(tag => (
           <span key={tag} style={{
-            background: '#222', color: '#666',
+            background: 'var(--border)', color: 'var(--text-muted)',
             padding: '2px 10px', borderRadius: '20px', fontSize: '0.78rem'
           }}>#{tag}</span>
         ))}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px', alignItems: 'center' }}>
-          {/* 별 */}
           <button onClick={handleStar} style={{
             background: 'none', border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: '4px',
             fontSize: '0.875rem', padding: '4px 8px', borderRadius: '6px',
-            color: starred ? '#fbbf24' : '#555',
+            color: starred ? '#fbbf24' : 'var(--text-dim)',
             transition: 'color 0.2s'
           }}>
             {starred ? '★' : '☆'} {stars}
           </button>
-          {/* 하트 */}
           <button onClick={handleLike} style={{
             background: 'none', border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: '4px',
             fontSize: '0.875rem', padding: '4px 8px', borderRadius: '6px',
-            color: liked ? '#f87171' : '#555',
+            color: liked ? '#f87171' : 'var(--text-dim)',
             transition: 'color 0.2s'
           }}>
             {liked ? '♥' : '♡'} {likes}
           </button>
-          {/* 자세히 보기 */}
           <button onClick={goToPost} style={{
             background: 'none', border: 'none', cursor: 'pointer',
             color: '#6366f1', fontSize: '0.875rem', padding: '4px 8px'
