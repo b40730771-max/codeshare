@@ -3,16 +3,7 @@ import { useEffect, useState } from 'react';
 import { supabase, Post } from '@/lib/supabase';
 import CodeCard from '@/components/CodeCard';
 
-const LANGUAGES = [
-  '전체',
-  'javascript',
-  'typescript',
-  'python',
-  'rust',
-  'go',
-  'css',
-  'html',
-];
+const LANGUAGES = ['전체', 'javascript', 'typescript', 'python', 'rust', 'go', 'css', 'html', 'java', 'c++', 'c']
 
 export default function HomePage() {
   const [posts, setPosts] = useState<Post[]>([]);
