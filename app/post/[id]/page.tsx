@@ -28,18 +28,26 @@ export default function PostPage() {
   const [versions, setVersions] = useState<Version[]>([])
   const [showVersions, setShowVersions] = useState(false)
   const [fileRefresh, setFileRefresh] = useState(0)
+  const [isOwner, setIsOwner] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     const load = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+
       const { data: p } = await supabase
         .from('posts')
         .select('*, profiles(username, avatar_url)')
         .eq('id', id)
         .single()
-      if (p) { setPost(p); setLikes(p.likes_count); setStars((p as any).stars_count || 0) }
 
-      const { data: { user } } = await supabase.auth.getUser()
+      if (p) {
+        setPost(p)
+        setLikes(p.likes_count)
+        setStars((p as any).stars_count || 0)
+        if (user) setIsOwner(user.id === p.user_id)
+      }
+
       if (user) {
         setMyId(user.id)
 
@@ -65,7 +73,8 @@ export default function PostPage() {
         .from('post_versions')
         .select('*')
         .eq('post_id', id)
-        .order('version_number', { ascending: false })
+        .neq('commit_message', '__rollback__')
+        .order('created_at', { ascending: false })
       setVersions(v || [])
     }
     load()
@@ -135,18 +144,17 @@ export default function PostPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    // 현재 버전을 히스토리에 저장 (숨김 처리)
+    // 현재 상태 숨김 버전으로 저장
     await supabase.from('post_versions').insert({
       post_id: id,
       user_id: user.id,
       code: post!.code,
       title: post!.title,
-      description: (post as any)?.description,
-      commit_message: `__rollback__`,
-      version_number: Date.now()
+      commit_message: '__rollback__',
+      version_number: 9999
     })
 
-    // 롤백 실행
+    // 롤백
     const { error } = await supabase.from('posts')
       .update({ code: version.code, title: version.title })
       .eq('id', id)
@@ -156,8 +164,6 @@ export default function PostPage() {
   }
 
   if (!post) return <p style={{ color: 'var(--text-dim)' }}>불러오는 중...</p>
-
-  const isOwner = !!myId && myId === post.user_id
 
   return (
     <div style={{ maxWidth: '800px' }}>
@@ -186,7 +192,7 @@ export default function PostPage() {
             )}
           </div>
         </div>
-        {post.description && <p style={{ marginTop: '1rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>{(post as any).description}</p>}
+        {(post as any).description && <p style={{ marginTop: '1rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>{(post as any).description}</p>}
       </div>
 
       {/* 코드 */}
@@ -248,7 +254,7 @@ export default function PostPage() {
           </button>
           {showVersions && (
             <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {versions.filter(v => v.commit_message !== '__rollback__').map(v => (
+              {versions.map(v => (
                 <div key={v.id} style={{
                   background: 'var(--bg-card)', border: '1px solid var(--border)',
                   borderRadius: '8px', padding: '12px 16px',
