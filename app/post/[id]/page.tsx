@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase, Post, Comment } from '@/lib/supabase'
 import { useParams, useRouter } from 'next/navigation'
+import CodeBlock from '@/components/CodeBlock'
 
 type Version = {
   id: string
@@ -68,19 +69,24 @@ export default function PostPage() {
       .insert({ post_id: id, user_id: user.id, content: newComment })
       .select('*, profiles(username, avatar_url)')
       .single()
-    if (data) { setComments(c => [...c, data]); setNewComment('') }
+    if (data) {
+      setComments(c => [...c, data])
+      setNewComment('')
+      if (user.id !== post?.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: post?.user_id, from_user_id: user.id, type: 'comment', post_id: id
+        })
+      }
+    }
   }
 
   const rollback = async (version: Version) => {
     if (!confirm(`v${version.version_number} "${version.commit_message}" 버전으로 롤백할까요?`)) return
-    await supabase.from('posts').update({
-      code: version.code,
-      title: version.title,
-    }).eq('id', id)
+    await supabase.from('posts').update({ code: version.code, title: version.title }).eq('id', id)
     window.location.reload()
   }
 
-  if (!post) return <p style={{ color: '#555' }}>불러오는 중...</p>
+  if (!post) return <p style={{ color: 'var(--text-dim)' }}>불러오는 중...</p>
 
   const isOwner = myId === post.user_id
 
@@ -89,13 +95,13 @@ export default function PostPage() {
       {/* 헤더 */}
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>{post.title}</h1>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0, color: 'var(--text)' }}>{post.title}</h1>
           <span style={{ background: '#2a2a3a', color: '#a5b4fc', padding: '4px 12px', borderRadius: '6px', fontSize: '0.85rem' }}>
             {post.language}
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
-          <p style={{ color: '#888', margin: 0, fontSize: '0.875rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px', flexWrap: 'wrap' }}>
+          <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.875rem' }}>
             by {post.profiles?.username} · {new Date(post.created_at).toLocaleDateString('ko-KR')}
           </p>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -107,27 +113,23 @@ export default function PostPage() {
             )}
           </div>
         </div>
-        {post.description && <p style={{ marginTop: '1rem', color: '#ccc', lineHeight: 1.7 }}>{post.description}</p>}
+        {post.description && <p style={{ marginTop: '1rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>{post.description}</p>}
       </div>
 
       {/* 코드 */}
-      <pre style={{
-        background: '#111', borderRadius: '12px', padding: '1.5rem',
-        overflowX: 'auto', fontSize: '0.875rem', color: '#ccc',
-        lineHeight: 1.6, marginBottom: '1.5rem'
-      }}>
-        <code>{post.code}</code>
-      </pre>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <CodeBlock code={post.code} language={post.language} />
+      </div>
 
       {/* 태그 + 좋아요 */}
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '2rem' }}>
         {post.tags?.map(tag => (
-          <span key={tag} style={{ background: '#222', color: '#888', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem' }}>
+          <span key={tag} style={{ background: 'var(--border)', color: 'var(--text-muted)', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem' }}>
             #{tag}
           </span>
         ))}
         <button onClick={handleLike} style={{
-          marginLeft: 'auto', background: '#1a1a1a', border: '1px solid #2a2a2a',
+          marginLeft: 'auto', background: 'var(--bg-card)', border: '1px solid var(--border)',
           color: '#f87171', padding: '6px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem'
         }}>
           ♥ {likes}
@@ -138,7 +140,7 @@ export default function PostPage() {
       {versions.length > 0 && (
         <div style={{ marginBottom: '2rem' }}>
           <button onClick={() => setShowVersions(!showVersions)} style={{
-            background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#a5b4fc',
+            background: 'var(--bg-card)', border: '1px solid var(--border)', color: '#a5b4fc',
             padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem',
             display: 'flex', alignItems: 'center', gap: '8px'
           }}>
@@ -148,21 +150,19 @@ export default function PostPage() {
             <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {versions.map(v => (
                 <div key={v.id} style={{
-                  background: '#1a1a1a', border: '1px solid #2a2a2a',
+                  background: 'var(--bg-card)', border: '1px solid var(--border)',
                   borderRadius: '8px', padding: '12px 16px',
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                 }}>
                   <div>
                     <span style={{ color: '#6366f1', fontSize: '0.8rem', marginRight: '8px' }}>v{v.version_number}</span>
-                    <span style={{ color: '#eee', fontSize: '0.9rem' }}>{v.commit_message}</span>
-                    <p style={{ margin: '4px 0 0', color: '#555', fontSize: '0.75rem' }}>
+                    <span style={{ color: 'var(--text)', fontSize: '0.9rem' }}>{v.commit_message}</span>
+                    <p style={{ margin: '4px 0 0', color: 'var(--text-dim)', fontSize: '0.75rem' }}>
                       {new Date(v.created_at).toLocaleString('ko-KR')}
                     </p>
                   </div>
                   {isOwner && (
-                    <button onClick={() => rollback(v)} style={smallBtn}>
-                      ↩ 롤백
-                    </button>
+                    <button onClick={() => rollback(v)} style={smallBtn}>↩ 롤백</button>
                   )}
                 </div>
               ))}
@@ -173,17 +173,17 @@ export default function PostPage() {
 
       {/* 댓글 */}
       <div>
-        <h2 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>댓글 {comments.length}개</h2>
+        <h2 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--text)' }}>댓글 {comments.length}개</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '1.5rem' }}>
           {comments.map(c => (
-            <div key={c.id} style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '8px', padding: '12px 16px' }}>
+            <div key={c.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px 16px' }}>
               <p style={{ margin: '0 0 6px', fontWeight: 600, fontSize: '0.875rem', color: '#a5b4fc' }}>
                 {c.profiles?.username}
-                <span style={{ color: '#555', fontWeight: 400, marginLeft: '8px', fontSize: '0.8rem' }}>
+                <span style={{ color: 'var(--text-dim)', fontWeight: 400, marginLeft: '8px', fontSize: '0.8rem' }}>
                   {new Date(c.created_at).toLocaleDateString('ko-KR')}
                 </span>
               </p>
-              <p style={{ margin: 0, color: '#ccc', lineHeight: 1.6 }}>{c.content}</p>
+              <p style={{ margin: 0, color: 'var(--text)', lineHeight: 1.6 }}>{c.content}</p>
             </div>
           ))}
         </div>
@@ -192,8 +192,8 @@ export default function PostPage() {
             value={newComment} onChange={e => setNewComment(e.target.value)}
             placeholder="댓글을 입력하세요..." required
             style={{
-              flex: 1, background: '#1a1a1a', border: '1px solid #2a2a2a',
-              color: '#eee', padding: '10px 14px', borderRadius: '8px',
+              flex: 1, background: 'var(--bg-input)', border: '1px solid var(--border)',
+              color: 'var(--text)', padding: '10px 14px', borderRadius: '8px',
               fontSize: '0.95rem', outline: 'none'
             }}
           />
@@ -208,6 +208,6 @@ export default function PostPage() {
 }
 
 const smallBtn: React.CSSProperties = {
-  background: '#2a2a2a', color: '#eee', border: 'none',
+  background: 'var(--bg-card)', color: 'var(--text-muted)', border: '1px solid var(--border)',
   padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem'
 }
