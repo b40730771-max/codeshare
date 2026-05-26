@@ -3,18 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 
-const LANGUAGES = [
-  'javascript',
-  'typescript',
-  'python',
-  'rust',
-  'go',
-  'css',
-  'html',
-  'java',
-  'cpp',
-  'other',
-];
+const LANGUAGES = ['javascript', 'typescript', 'python', 'rust', 'go', 'css', 'html', 'java', 'c++', 'c', 'other']
 
 export default function UploadPage() {
   const [title, setTitle] = useState('');
