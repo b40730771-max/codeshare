@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'CodeShare',
   description: '코드를 공유하고 아이디어를 나누세요',
+  verification: {
+    google: '<meta name="google-site-verification" content="bQddY3W62scoVWtSY6k2KtSgIQt3MXYRC7iLXDxLQlQ" />',
+  }
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
