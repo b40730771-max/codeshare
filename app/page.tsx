@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase, Post } from '@/lib/supabase'
 import CodeCard from '@/components/CodeCard'
 
-const LANGUAGES = ['전체', 'javascript', 'typescript', 'python', 'rust', 'go', 'css', 'html', 'java', 'cpp', 'c']
+const LANGUAGES = ['전체', 'javascript', 'typescript', 'python', 'rust', 'go', 'css', 'html', 'java', 'c++', 'c']
 
 const FEATURES = [
   { icon: '💻', title: '코드 공유', desc: '내가 만든 코드를 공유하고 피드백을 받아보세요' },
