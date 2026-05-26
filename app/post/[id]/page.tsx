@@ -73,7 +73,6 @@ export default function PostPage() {
         .from('post_versions')
         .select('*')
         .eq('post_id', id)
-        .neq('commit_message', '__rollback__')
         .order('created_at', { ascending: false })
       setVersions(v || [])
     }
@@ -150,8 +149,8 @@ export default function PostPage() {
       user_id: user.id,
       code: post!.code,
       title: post!.title,
-      commit_message: '__rollback__',
-      version_number: 9999
+      commit_message: '🔄 자동 저장',
+      version_number: Date.now()
     })
 
     // 롤백
