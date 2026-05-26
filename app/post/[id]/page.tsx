@@ -130,15 +130,15 @@ export default function PostPage() {
   }
 
   const rollback = async (version: Version) => {
-    if (!confirm(`v${version.version_number} "${version.commit_message}" 버전으로 롤백할까요?`)) return
-    await supabase.from('posts').update({ code: version.code, title: version.title }).eq('id', id)
+    if (!window.confirm(`v${version.version_number} "${version.commit_message}" 버전으로 롤백할까요?`)) return
+    const { error } = await supabase.from('posts').update({ code: version.code, title: version.title }).eq('id', id)
+    if (error) { alert('롤백 실패: ' + error.message); return }
     window.location.reload()
   }
-
   if (!post) return <p style={{ color: 'var(--text-dim)' }}>불러오는 중...</p>
 
-  const isOwner = myId === post.user_id
-
+  const isOwner = !!myId && myId === post.user_id
+  
   return (
     <div style={{ maxWidth: '800px' }}>
       {/* 헤더 */}
