@@ -123,7 +123,7 @@ export default function MembersPage() {
                 </button>
               )}
             </div>
-            <p style={{ margin: 0, fontWeight: 600 }}>{m.username}</p>
+            <a href={`/user/${m.username}`} style={{ margin: 0, fontWeight: 600, color: 'var(--text)', textDecoration: 'none' }}>{m.username}</a>
             <p style={{ margin: 0, color: '#888', fontSize: '0.85rem' }}>{m.bio || '소개 없음'}</p>
             <div style={{ display: 'flex', gap: '12px', fontSize: '0.8rem', color: '#666' }}>
               <span>게시물 {m.post_count}</span>
