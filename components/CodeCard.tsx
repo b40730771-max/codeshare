@@ -106,10 +106,10 @@ export default function CodeCard({ post }: { post: Post }) {
           <span key={tag} style={{ background: '#222', color: '#888', padding: '2px 10px', borderRadius: '20px', fontSize: '0.78rem' }}>#{tag}</span>
         ))}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px' }}>
-          <button onClick={handleStar} style={{ background: 'none', border: 'none', color: starred ? '#fbbf24' : '#666', cursor: 'pointer', fontSize: '0.875rem' }}>
+          <button onClick={handleStar} style={{ background: 'none', border: 'none', color: starred ? '#fbbf24' : '#fff', cursor: 'pointer', fontSize: '0.875rem' }}>
             ⭐ {stars}
           </button>
-          <button onClick={handleLike} style={{ background: 'none', border: 'none', color: liked ? '#f87171' : '#666', cursor: 'pointer', fontSize: '0.875rem' }}>
+          <button onClick={handleLike} style={{ background: 'none', border: 'none', color: liked ? '#f87171' : '#fff', cursor: 'pointer', fontSize: '0.875rem' }}>
             ♥ {likes}
           </button>
           <button onClick={goToPost} style={{ background: 'none', border: 'none', color: '#6366f1', cursor: 'pointer', fontSize: '0.875rem' }}>
