@@ -130,17 +130,12 @@ export default function PostPage() {
   }
 
   const rollback = async (version: Version) => {
-    if (!window.confirm(`v${version.version_number} "${version.commit_message}" 버전으로 롤백할까요?`)) return
+    if (!window.confirm(`"${version.commit_message}" 버전으로 롤백할까요?`)) return
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    // 현재 버전을 히스토리에 저장
-    const { count } = await supabase
-      .from('post_versions')
-      .select('*', { count: 'exact', head: true })
-      .eq('post_id', id)
-
+    // 현재 버전을 히스토리에 저장 (숨김 처리)
     await supabase.from('post_versions').insert({
       post_id: id,
       user_id: user.id,
@@ -148,7 +143,7 @@ export default function PostPage() {
       title: post!.title,
       description: (post as any)?.description,
       commit_message: `__rollback__`,
-      version_number: (count || 0) + 1
+      version_number: Date.now()
     })
 
     // 롤백 실행
