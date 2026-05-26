@@ -79,7 +79,12 @@ export default function ProfilePage() {
       .eq('id', user.id)
 
     setSaving(false)
-    setMsg(error ? '저장 실패: ' + error.message : '저장되었습니다 ✓')
+    if (error) {
+      setMsg('저장 실패: ' + error.message)
+    } else {
+      setAvatarUrl(newAvatarUrl)
+      setMsg('저장되었습니다 ✓')
+    }
   }
 
   const unfollow = async (targetId: string) => {
