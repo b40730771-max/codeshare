@@ -14,7 +14,6 @@ export default function CodeCard({ post }: { post: Post }) {
     const checkStatus = async () => {
       const { data: { user } } = await supabase.auth.getUser()
 
-      // 실제 카운트 DB에서 다시 가져오기
       const { data: postData } = await supabase
         .from('posts')
         .select('likes_count, stars_count')
@@ -94,7 +93,11 @@ export default function CodeCard({ post }: { post: Post }) {
         <div>
           <span style={{ color: 'var(--text)', fontWeight: 600, fontSize: '1.05rem' }}>{post.title}</span>
           <p style={{ margin: '4px 0 0', color: 'var(--text-dim)', fontSize: '0.85rem' }}>
-            by {post.profiles?.username} · {new Date(post.created_at).toLocaleDateString('ko-KR')}
+            by{' '}
+            <a href={`/user/${post.profiles?.username}`} style={{ color: '#a5b4fc', textDecoration: 'none' }}>
+              {post.profiles?.username}
+            </a>
+            {' '}· {new Date(post.created_at).toLocaleDateString('ko-KR')}
           </p>
         </div>
         <span style={{
