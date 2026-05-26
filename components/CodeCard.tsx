@@ -19,7 +19,7 @@ export default function CodeCard({ post }: { post: Post }) {
         .select('id')
         .eq('post_id', post.id)
         .eq('user_id', user.id)
-        .single()
+        .maybeSingle()
       setLiked(!!like)
 
       const { data: star } = await supabase
@@ -27,7 +27,7 @@ export default function CodeCard({ post }: { post: Post }) {
         .select('id')
         .eq('post_id', post.id)
         .eq('user_id', user.id)
-        .single()
+        .maybeSingle()
       setStarred(!!star)
     }
     checkStatus()
