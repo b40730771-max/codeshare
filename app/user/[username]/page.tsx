@@ -27,7 +27,8 @@ type Post = {
 }
 
 export default function UserProfilePage() {
-  const { username } = useParams<{ username: string }>()
+  const params = useParams<{ username: string }>()
+  const username = decodeURIComponent(params.username)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [posts, setPosts] = useState<Post[]>([])
   const [myId, setMyId] = useState('')
