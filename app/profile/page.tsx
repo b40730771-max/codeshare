@@ -68,7 +68,7 @@ export default function ProfilePage() {
     let newAvatarUrl = avatarUrl
     if (avatarFile) {
       const ext = avatarFile.name.split('.').pop()
-      const path = `avatars/${user.id}.${ext}`
+      const path = `avatars/${user.id}_${Date.now()}.${ext}`
       await supabase.storage.from('avatars').upload(path, avatarFile, { upsert: true })
       const { data } = supabase.storage.from('avatars').getPublicUrl(path)
       newAvatarUrl = data.publicUrl
