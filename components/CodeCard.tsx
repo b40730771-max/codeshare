@@ -5,12 +5,32 @@ import { useState } from 'react'
 
 export default function CodeCard({ post }: { post: Post }) {
   const [likes, setLikes] = useState(post.likes_count)
+  const [stars, setStars] = useState((post as any).stars_count || 0)
 
   const handleLike = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { alert('로그인이 필요합니다'); return }
     const { error } = await supabase.from('likes').insert({ post_id: post.id, user_id: user.id })
-    if (!error) setLikes(l => l + 1)
+    if (!error) {
+      setLikes(l => l + 1)
+      await supabase.from('notifications').insert({
+        user_id: post.user_id, from_user_id: user.id,
+        type: 'like', post_id: post.id
+      })
+    }
+  }
+
+  const handleStar = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { alert('로그인이 필요합니다'); return }
+    const { error } = await supabase.from('stars').insert({ post_id: post.id, user_id: user.id })
+    if (!error) {
+      setStars((s: number) => s + 1)
+      await supabase.from('notifications').insert({
+        user_id: post.user_id, from_user_id: user.id,
+        type: 'star', post_id: post.id
+      })
+    }
   }
 
   const goToPost = async () => {
@@ -44,6 +64,9 @@ export default function CodeCard({ post }: { post: Post }) {
           <span key={tag} style={{ background: '#222', color: '#888', padding: '2px 10px', borderRadius: '20px', fontSize: '0.78rem' }}>#{tag}</span>
         ))}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px' }}>
+          <button onClick={handleStar} style={{ background: 'none', border: 'none', color: '#fbbf24', cursor: 'pointer', fontSize: '0.875rem' }}>
+            ⭐ {stars}
+          </button>
           <button onClick={handleLike} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.875rem' }}>
             ♥ {likes}
           </button>
