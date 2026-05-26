@@ -161,7 +161,7 @@ export default function ProfilePage() {
                 {u.avatar_url ? <img src={u.avatar_url} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} alt="" /> : u.username[0]?.toUpperCase()}
               </div>
               <div style={{ flex: 1 }}>
-                <a href={`/user/${u.username}`} style={{ margin: 0, fontWeight: 600, color: 'var(--text)', textDecoration: 'none' }}>{u.username}</a>
+                <a href={`/user/${u.username}`} style={{ margin: 0, fontWeight: 600, color: '#ffffff', textDecoration: 'none' }}>{u.username}</a>
                 <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.8rem' }}>{u.bio || '소개 없음'}</p>
               </div>
               <p style={{ margin: 0, color: 'var(--text-dim)', fontSize: '0.8rem' }}>팔로워 {u.followers_count}</p>
