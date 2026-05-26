@@ -180,7 +180,7 @@ export default function ProfilePage() {
                 {u.avatar_url ? <img src={u.avatar_url} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} alt="" /> : u.username[0]?.toUpperCase()}
               </div>
               <div style={{ flex: 1 }}>
-                <p style={{ margin: 0, fontWeight: 600, color: 'var(--text)' }}>{u.username}</p>
+                <a href={`/user/${u.username}`} style={{ margin: 0, fontWeight: 600, color: '#ffffff', textDecoration: 'none' }}>{u.username}</a>
                 <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.8rem' }}>{u.bio || '소개 없음'}</p>
               </div>
               <button onClick={() => unfollow(u.id)} style={{ background: '#2a2a2a', color: '#f87171', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem' }}>
