@@ -1,35 +1,77 @@
 'use client'
 import { Post } from '@/lib/supabase'
 import { supabase } from '@/lib/supabase'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function CodeCard({ post }: { post: Post }) {
   const [likes, setLikes] = useState(post.likes_count)
   const [stars, setStars] = useState((post as any).stars_count || 0)
+  const [liked, setLiked] = useState(false)
+  const [starred, setStarred] = useState(false)
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data: like } = await supabase
+        .from('likes')
+        .select('id')
+        .eq('post_id', post.id)
+        .eq('user_id', user.id)
+        .single()
+      setLiked(!!like)
+
+      const { data: star } = await supabase
+        .from('stars')
+        .select('id')
+        .eq('post_id', post.id)
+        .eq('user_id', user.id)
+        .single()
+      setStarred(!!star)
+    }
+    checkStatus()
+  }, [post.id])
 
   const handleLike = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { alert('로그인이 필요합니다'); return }
-    const { error } = await supabase.from('likes').insert({ post_id: post.id, user_id: user.id })
-    if (!error) {
+
+    if (liked) {
+      await supabase.from('likes').delete().eq('post_id', post.id).eq('user_id', user.id)
+      setLikes(l => l - 1)
+      setLiked(false)
+    } else {
+      await supabase.from('likes').insert({ post_id: post.id, user_id: user.id })
       setLikes(l => l + 1)
-      await supabase.from('notifications').insert({
-        user_id: post.user_id, from_user_id: user.id,
-        type: 'like', post_id: post.id
-      })
+      setLiked(true)
+      if (user.id !== post.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: post.user_id, from_user_id: user.id,
+          type: 'like', post_id: post.id
+        })
+      }
     }
   }
 
   const handleStar = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { alert('로그인이 필요합니다'); return }
-    const { error } = await supabase.from('stars').insert({ post_id: post.id, user_id: user.id })
-    if (!error) {
+
+    if (starred) {
+      await supabase.from('stars').delete().eq('post_id', post.id).eq('user_id', user.id)
+      setStars((s: number) => s - 1)
+      setStarred(false)
+    } else {
+      await supabase.from('stars').insert({ post_id: post.id, user_id: user.id })
       setStars((s: number) => s + 1)
-      await supabase.from('notifications').insert({
-        user_id: post.user_id, from_user_id: user.id,
-        type: 'star', post_id: post.id
-      })
+      setStarred(true)
+      if (user.id !== post.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: post.user_id, from_user_id: user.id,
+          type: 'star', post_id: post.id
+        })
+      }
     }
   }
 
@@ -64,10 +106,10 @@ export default function CodeCard({ post }: { post: Post }) {
           <span key={tag} style={{ background: '#222', color: '#888', padding: '2px 10px', borderRadius: '20px', fontSize: '0.78rem' }}>#{tag}</span>
         ))}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px' }}>
-          <button onClick={handleStar} style={{ background: 'none', border: 'none', color: '#fbbf24', cursor: 'pointer', fontSize: '0.875rem' }}>
+          <button onClick={handleStar} style={{ background: 'none', border: 'none', color: starred ? '#fbbf24' : '#666', cursor: 'pointer', fontSize: '0.875rem' }}>
             ⭐ {stars}
           </button>
-          <button onClick={handleLike} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.875rem' }}>
+          <button onClick={handleLike} style={{ background: 'none', border: 'none', color: liked ? '#f87171' : '#666', cursor: 'pointer', fontSize: '0.875rem' }}>
             ♥ {likes}
           </button>
           <button onClick={goToPost} style={{ background: 'none', border: 'none', color: '#6366f1', cursor: 'pointer', fontSize: '0.875rem' }}>
