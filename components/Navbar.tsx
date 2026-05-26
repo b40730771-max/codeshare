@@ -78,7 +78,7 @@ export default function Navbar() {
           <>
             <Link href="/friends" style={navLink}>친구</Link>
             <Link href="/mail" style={navLink}>✉️ 우편함</Link>
-            <Link href="/notifications" style={{ ...navLink, position: 'relative' }}>
+            <Link href="/notifications" onClick={() => setUnread(0)} style={{ ...navLink, position: 'relative' }}>
               🔔 알림
               {unread > 0 && (
                 <span style={{
