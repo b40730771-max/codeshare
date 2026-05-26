@@ -3,10 +3,12 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import { useTheme } from '@/lib/theme'
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null)
   const [unread, setUnread] = useState(0)
+  const { theme, toggle } = useTheme()
   const router = useRouter()
 
   useEffect(() => {
@@ -34,7 +36,6 @@ export default function Navbar() {
     setUnread(count || 0)
   }
 
-  // 실시간 알림 구독
   useEffect(() => {
     if (!user) return
     const channel = supabase
@@ -42,9 +43,7 @@ export default function Navbar() {
       .on('postgres_changes', {
         event: 'INSERT', schema: 'public', table: 'notifications',
         filter: `user_id=eq.${user.id}`
-      }, () => {
-        setUnread(n => n + 1)
-      })
+      }, () => setUnread(n => n + 1))
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [user])
@@ -56,8 +55,8 @@ export default function Navbar() {
 
   return (
     <nav style={{
-      background: '#0f0f0f',
-      borderBottom: '1px solid #1e1e1e',
+      background: 'var(--nav-bg)',
+      borderBottom: '1px solid var(--border)',
       padding: '0 2rem',
       height: '60px',
       display: 'flex',
@@ -67,7 +66,7 @@ export default function Navbar() {
       top: 0,
       zIndex: 100
     }}>
-      <Link href="/" style={{ color: '#fff', fontWeight: 700, fontSize: '1.2rem', textDecoration: 'none' }}>
+      <Link href="/" style={{ color: 'var(--text)', fontWeight: 700, fontSize: '1.2rem', textDecoration: 'none' }}>
         {'<CodeShare />'}
       </Link>
       <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
@@ -101,13 +100,21 @@ export default function Navbar() {
             </Link>
           </>
         )}
+        {/* 테마 토글 */}
+        <button onClick={toggle} style={{
+          background: 'none', border: '1px solid var(--border)',
+          color: 'var(--text)', padding: '6px 10px', borderRadius: '6px',
+          cursor: 'pointer', fontSize: '1rem'
+        }}>
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
       </div>
     </nav>
   )
 }
 
 const navLink: React.CSSProperties = {
-  color: '#aaa',
+  color: 'var(--text-muted)',
   textDecoration: 'none',
   fontSize: '0.9rem',
   transition: 'color 0.2s'
