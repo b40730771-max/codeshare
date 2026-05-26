@@ -82,7 +82,7 @@ export default function EditPage() {
     }).eq('id', id)
 
     if (error) setError(error.message)
-    else router.push(`/post/${id}`)
+    else window.location.href = `/post/${id}`
   }
 
   if (loading) return <p style={{ color: '#555' }}>불러오는 중...</p>
