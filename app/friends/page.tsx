@@ -71,13 +71,36 @@ export default function FriendsPage() {
     loadFriends(myId);
   };
 
-  const acceptRequest = async (id: string) => {
-    await supabase
+  const acceptRequest = async (friendshipId: string) => {
+    // 받은 요청 수락
+    const { data: friendship } = await supabase
       .from('friendships')
-      .update({ status: 'accepted' })
-      .eq('id', id);
-    loadFriends(myId);
-  };
+      .select('*')
+      .eq('id', friendshipId)
+      .single()
+
+    await supabase.from('friendships').update({ status: 'accepted' }).eq('id', friendshipId)
+
+    // 반대 방향도 친구 추가
+    if (friendship) {
+      const { data: existing } = await supabase
+        .from('friendships')
+        .select('id')
+        .eq('requester_id', friendship.receiver_id)
+        .eq('receiver_id', friendship.requester_id)
+        .maybeSingle()
+
+      if (!existing) {
+        await supabase.from('friendships').insert({
+          requester_id: friendship.receiver_id,
+          receiver_id: friendship.requester_id,
+          status: 'accepted'
+        })
+      }
+    }
+
+    loadFriends(myId)
+  }
 
   const rejectRequest = async (id: string) => {
     await supabase.from('friendships').delete().eq('id', id);
