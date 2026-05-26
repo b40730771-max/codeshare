@@ -122,16 +122,13 @@ export default function CodeCard({ post }: { post: Post }) {
           >
             ♥ {likes}
           </button>
-          <Link
-            href={`/post/${post.id}`}
-            style={{
-              color: '#6366f1',
-              fontSize: '0.875rem',
-              textDecoration: 'none',
-            }}
-          >
+          <button onClick={async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) { window.location.href = '/login'; return }
+            window.location.href = `/post/${post.id}`
+          }} style={{ background: 'none', border: 'none', color: '#6366f1', cursor: 'pointer', fontSize: '0.875rem' }}>
             자세히 보기 →
-          </Link>
+          </button>
         </div>
       </div>
     </div>
