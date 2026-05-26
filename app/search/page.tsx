@@ -14,7 +14,8 @@ const LANGUAGES = [
   'css',
   'html',
   'java',
-  'cpp',
+  'c++',
+  'c'
 ];
 
 export default function SearchPage() {
