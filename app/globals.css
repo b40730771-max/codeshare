@@ -1,27 +1,65 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+:root {
+  --bg: #0a0a0a;
+  --bg-card: #1a1a1a;
+  --bg-input: #1a1a1a;
+  --border: #2a2a2a;
+  --text: #eeeeee;
+  --text-muted: #888888;
+  --text-dim: #555555;
+  --nav-bg: #0f0f0f;
+  --code-bg: #111111;
+  --primary: #6366f1;
+  --primary-light: #a5b4fc;
+}
+
+[data-theme='light'] {
+  --bg: #f5f5f5;
+  --bg-card: #ffffff;
+  --bg-input: #f9f9f9;
+  --border: #e0e0e0;
+  --text: #111111;
+  --text-muted: #555555;
+  --text-dim: #999999;
+  --nav-bg: #ffffff;
+  --code-bg: #f0f0f0;
+  --primary: #6366f1;
+  --primary-light: #6366f1;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: background 0.2s, color 0.2s;
+}
+
+a { color: inherit; }
+
+pre, code {
+  font-family: 'Fira Code', 'Courier New', monospace;
+}
+
+::selection {
+  background: #6366f1;
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
 }
