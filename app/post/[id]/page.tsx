@@ -19,6 +19,9 @@ export default function PostPage() {
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState('')
   const [likes, setLikes] = useState(0)
+  const [liked, setLiked] = useState(false)
+  const [starred, setStarred] = useState(false)
+  const [stars, setStars] = useState(0)
   const [myId, setMyId] = useState('')
   const [versions, setVersions] = useState<Version[]>([])
   const [showVersions, setShowVersions] = useState(false)
@@ -31,10 +34,22 @@ export default function PostPage() {
         .select('*, profiles(username, avatar_url)')
         .eq('id', id)
         .single()
-      if (p) { setPost(p); setLikes(p.likes_count) }
+      if (p) { setPost(p); setLikes(p.likes_count); setStars((p as any).stars_count || 0) }
 
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) setMyId(user.id)
+      if (user) {
+        setMyId(user.id)
+
+        const { data: like } = await supabase
+          .from('likes').select('id')
+          .eq('post_id', id).eq('user_id', user.id).maybeSingle()
+        setLiked(!!like)
+
+        const { data: star } = await supabase
+          .from('stars').select('id')
+          .eq('post_id', id).eq('user_id', user.id).maybeSingle()
+        setStarred(!!star)
+      }
 
       const { data: c } = await supabase
         .from('comments')
@@ -56,8 +71,39 @@ export default function PostPage() {
   const handleLike = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { alert('로그인이 필요합니다'); return }
-    const { error } = await supabase.from('likes').insert({ post_id: id, user_id: user.id })
-    if (!error) setLikes(l => l + 1)
+    if (liked) {
+      await supabase.from('likes').delete().eq('post_id', id).eq('user_id', user.id)
+      setLikes(l => l - 1)
+      setLiked(false)
+    } else {
+      await supabase.from('likes').insert({ post_id: id, user_id: user.id })
+      setLikes(l => l + 1)
+      setLiked(true)
+      if (user.id !== post?.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: post?.user_id, from_user_id: user.id, type: 'like', post_id: id
+        })
+      }
+    }
+  }
+
+  const handleStar = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { alert('로그인이 필요합니다'); return }
+    if (starred) {
+      await supabase.from('stars').delete().eq('post_id', id).eq('user_id', user.id)
+      setStars(s => s - 1)
+      setStarred(false)
+    } else {
+      await supabase.from('stars').insert({ post_id: id, user_id: user.id })
+      setStars(s => s + 1)
+      setStarred(true)
+      if (user.id !== post?.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: post?.user_id, from_user_id: user.id, type: 'star', post_id: id
+        })
+      }
+    }
   }
 
   const submitComment = async (e: React.FormEvent) => {
@@ -121,19 +167,27 @@ export default function PostPage() {
         <CodeBlock code={post.code} language={post.language} />
       </div>
 
-      {/* 태그 + 좋아요 */}
+      {/* 태그 + 좋아요 + 별 */}
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '2rem' }}>
         {post.tags?.map(tag => (
           <span key={tag} style={{ background: 'var(--border)', color: 'var(--text-muted)', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem' }}>
             #{tag}
           </span>
         ))}
-        <button onClick={handleLike} style={{
-          marginLeft: 'auto', background: 'var(--bg-card)', border: '1px solid var(--border)',
-          color: '#f87171', padding: '6px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem'
-        }}>
-          ♥ {likes}
-        </button>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px' }}>
+          <button onClick={handleStar} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: starred ? '#fbbf24' : 'var(--text-dim)', fontSize: '0.9rem'
+          }}>
+            {starred ? '★' : '☆'} {stars}
+          </button>
+          <button onClick={handleLike} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: liked ? '#f87171' : 'var(--text-dim)', fontSize: '0.9rem'
+          }}>
+            {liked ? '♥' : '♡'} {likes}
+          </button>
+        </div>
       </div>
 
       {/* 버전 히스토리 */}
