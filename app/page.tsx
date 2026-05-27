@@ -4,7 +4,7 @@ import { supabase, Post } from '@/lib/supabase'
 import CodeCard from '@/components/CodeCard'
 import Link from 'next/link'
 
-const LANGUAGES = ['전체', 'javascript', 'typescript', 'python', 'rust', 'go', 'css', 'html', 'java', 'c++', 'c']
+const LANGUAGES = ['전체', 'javascript', 'typescript', 'python', 'rust', 'go', 'css', 'html', 'java', 'cpp', 'c']
 
 const SLIDES = [
   {
@@ -64,8 +64,8 @@ function Carousel({ showButtons }: { showButtons: boolean }) {
     <div style={{ position: 'relative', marginBottom: '2rem' }}>
       <div style={{
         background: SLIDES[slide].bg,
-        padding: '6px 14px',
         borderRadius: '20px',
+        padding: '4rem 2rem',
         textAlign: 'center',
         transition: 'all 0.5s ease',
         minHeight: '280px',
@@ -87,42 +87,34 @@ function Carousel({ showButtons }: { showButtons: boolean }) {
         {(SLIDES[slide] as any).extra && (
           <p style={{ color: '#6366f1', fontSize: '0.9rem' }}>📧 {(SLIDES[slide] as any).extra}</p>
         )}
-
-        {/* 로그인 전 버튼 */}
         {showButtons && (
           <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
             <Link href="/signup" style={{
               background: '#6366f1', color: '#fff', padding: '12px 32px',
               borderRadius: '8px', textDecoration: 'none', fontWeight: 700, fontSize: '1rem'
-            }}>
-              Sign Up
-            </Link>
+            }}>Sign Up</Link>
             <Link href="/login" style={{
               background: 'transparent', color: '#fff', padding: '12px 32px',
               borderRadius: '8px', textDecoration: 'none', fontWeight: 700, fontSize: '1rem',
               border: '1px solid rgba(255,255,255,0.3)'
-            }}>
-              Sign In
-            </Link>
+            }}>Sign In</Link>
           </div>
         )}
       </div>
 
-      {/* 좌우 버튼 */}
       <button onClick={() => setSlide(s => (s - 1 + SLIDES.length) % SLIDES.length)} style={{
-        position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)',
+        position: 'absolute', left: '12px', top: '45%', transform: 'translateY(-50%)',
         background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff',
         width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer',
         fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center'
       }}>‹</button>
       <button onClick={() => setSlide(s => (s + 1) % SLIDES.length)} style={{
-        position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
+        position: 'absolute', right: '12px', top: '45%', transform: 'translateY(-50%)',
         background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff',
         width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer',
         fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center'
       }}>›</button>
 
-      {/* 점 인디케이터 */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '1rem' }}>
         {SLIDES.map((_, i) => (
           <button key={i} onClick={() => setSlide(i)} style={{
@@ -181,10 +173,8 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* 캐러셀 — 항상 보임 */}
       <Carousel showButtons={!user} />
 
-      {/* 로그인 안 된 경우 기능 카드 */}
       {!user && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
           {[
@@ -205,7 +195,6 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* 로그인 된 경우 피드 */}
       {user && (
         <>
           <div style={{ marginBottom: '1.5rem' }}>
@@ -221,9 +210,11 @@ export default function HomePage() {
                 background: lang === l ? '#6366f1' : 'var(--bg-card)',
                 color: lang === l ? '#fff' : 'var(--text-muted)',
                 border: '1px solid var(--border)',
-                padding: '4rem 2rem',
+                padding: '6px 14px',
                 borderRadius: '20px',
-                cursor: 'pointer', fontSize: '0.85rem'
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                lineHeight: '1.5'
               }}>{l}</button>
             ))}
           </div>
