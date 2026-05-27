@@ -4,7 +4,7 @@ import { supabase, Post } from '@/lib/supabase'
 import CodeCard from '@/components/CodeCard'
 import Link from 'next/link'
 
-const LANGUAGES = ['전체', 'javascript', 'typescript', 'python', 'rust', 'go', 'css', 'html', 'java', 'cpp', 'c']
+const LANGUAGES = ['전체', 'javascript', 'typescript', 'python', 'rust', 'go', 'css', 'html', 'java', 'c++', 'c']
 
 const SLIDES = [
   {
