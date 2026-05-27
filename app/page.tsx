@@ -11,7 +11,7 @@ const SLIDES = [
     icon: '⚡',
     title: 'CodeShare',
     subtitle: 'Share & Recommend & Follow & Talk',
-    desc: '개발자들과 코드를 공유하고 함께 성장하는 커뮤니티',
+    desc: '다양한 개발자들과 코드를 공유하고 추천하고, 댓글과 대화를 통해 함께 성장, 공유하는 커뮤니티',
     bg: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
     color: '#a5b4fc'
   },
@@ -35,7 +35,7 @@ const SLIDES = [
     icon: '👥',
     title: '소셜 기능',
     subtitle: 'Follow & Chat & Mail',
-    desc: '다른 개발자를 팔로우하고, 친구를 추가하고, 실시간 채팅과 쪽지로 소통하세요.',
+    desc: '다른 개발자를 팔로우하여 그 개발자의 작품을 확인하고, 친구를 추가하고, 실시간 채팅과 쪽지로 소통하세요.',
     bg: 'linear-gradient(135deg, #2d1b69 0%, #11998e 100%)',
     color: '#f87171'
   },
@@ -43,7 +43,7 @@ const SLIDES = [
     icon: '👨‍💻',
     title: '개발자 소개',
     subtitle: 'Developer',
-    desc: 'CodeShare는 개발자들이 서로 코드를 공유하고 성장할 수 있는 공간을 만들기 위해 개발됐어요.',
+    desc: '오류나 버그가 발견되면 쪽지로 보내주세요',
     extra: 'csw20100411@gmail.com',
     bg: 'linear-gradient(135deg, #1a1a2e 0%, #4a1942 100%)',
     color: '#a5b4fc'
