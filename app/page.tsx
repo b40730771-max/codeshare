@@ -61,7 +61,7 @@ function Carousel({ showButtons }: { showButtons: boolean }) {
   }, [])
 
   return (
-    <div style={{ position: 'relative', marginBottom: '2rem', width: '100%' }}>
+    <div style={{ position: 'relative', marginBottom: '2rem' }}>
       <div style={{
         background: SLIDES[slide].bg,
         borderRadius: '20px',
@@ -222,8 +222,7 @@ export default function HomePage() {
                 color: lang === l ? '#fff' : 'var(--text-muted)',
                 border: '1px solid var(--border)',
                 padding: '4rem 2rem',
-                width: '100%',
-                boxSizing: 'border-box' as const, borderRadius: '20px',
+                borderRadius: '20px',
                 cursor: 'pointer', fontSize: '0.85rem'
               }}>{l}</button>
             ))}
