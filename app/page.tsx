@@ -64,8 +64,8 @@ function Carousel({ showButtons }: { showButtons: boolean }) {
     <div style={{ position: 'relative', marginBottom: '2rem' }}>
       <div style={{
         background: SLIDES[slide].bg,
+        padding: '6px 14px',
         borderRadius: '20px',
-        padding: '4rem 2rem',
         textAlign: 'center',
         transition: 'all 0.5s ease',
         minHeight: '280px',
