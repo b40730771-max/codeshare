@@ -172,7 +172,7 @@ export default function HomePage() {
       .select('*, profiles(username, avatar_url)')
       .order('created_at', { ascending: false })
     if (lang !== '전체') query = query.eq('language', lang)
-    const { data } = await query
+    const { data } = await query.limit(10)
     setPosts(data || [])
     setLoading(false)
   }
