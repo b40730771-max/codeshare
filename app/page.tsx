@@ -2,28 +2,41 @@
 import { useEffect, useState } from 'react'
 import { supabase, Post } from '@/lib/supabase'
 import CodeCard from '@/components/CodeCard'
+import Link from 'next/link'
 
-const LANGUAGES = ['전체', 'javascript', 'typescript', 'python', 'rust', 'go', 'css', 'html', 'java', 'c++', 'c']
+const LANGUAGES = ['전체', 'javascript', 'typescript', 'python', 'rust', 'go', 'css', 'html', 'java', 'cpp', 'c']
 
 const FEATURES = [
-  { icon: '💻', title: '코드 공유', desc: '내가 만든 코드를 공유하고 피드백을 받아보세요' },
-  { icon: '🌿', title: '브랜치 & PR', desc: '브랜치로 작업하고 Pull Request로 코드 리뷰를 요청하세요' },
-  { icon: '📋', title: '커밋 히스토리', desc: '코드 변경 이력을 커밋으로 관리하고 롤백할 수 있어요' },
-  { icon: '🐛', title: 'Issues', desc: '버그를 신고하고 기능 요청을 관리하세요' },
-  { icon: '👥', title: '팔로우 & 친구', desc: '다른 개발자를 팔로우하고 친구를 만들어보세요' },
-  { icon: '💬', title: '실시간 채팅', desc: '친구와 실시간으로 대화하며 코드를 논의하세요' },
-  { icon: '✉️', title: '우편함', desc: '다른 사용자에게 쪽지를 보내고 받을 수 있어요' },
-  { icon: '🔔', title: '알림', desc: '좋아요, 댓글, 팔로우 알림을 실시간으로 받아요' },
+  { icon: '💻', title: 'Share', desc: '내가 만든 코드를 공유하세요' },
+  { icon: '⭐', title: 'Recommend', desc: '좋은 코드에 별과 하트를 남기세요' },
+  { icon: '👥', title: 'Follow', desc: '다른 개발자를 팔로우하세요' },
+  { icon: '💬', title: 'Talk', desc: '친구와 실시간으로 대화하세요' },
 ]
 
 export default function HomePage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [lang, setLang] = useState('전체')
   const [loading, setLoading] = useState(true)
-  const [showFeatures, setShowFeatures] = useState(false)
+  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    fetchPosts()
+    const init = async () => {
+      const { data } = await supabase.auth.getUser()
+      setUser(data.user)
+      if (data.user) fetchPosts()
+      else setLoading(false)
+    }
+    init()
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null)
+      if (session?.user) fetchPosts()
+    })
+    return () => listener.subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (user) fetchPosts()
   }, [lang])
 
   const fetchPosts = async () => {
@@ -38,51 +51,83 @@ export default function HomePage() {
     setLoading(false)
   }
 
-  return (
+  // 로그인 안 된 경우 랜딩 페이지
+  if (!user) return (
     <div>
       {/* 히어로 섹션 */}
       <div style={{
-        background: 'var(--bg-card)', border: '1px solid var(--border)',
-        borderRadius: '16px', padding: '2rem', marginBottom: '2rem',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem'
+        textAlign: 'center',
+        padding: '5rem 1rem',
+        background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+        borderRadius: '20px',
+        marginBottom: '4rem'
       }}>
-        <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 700, margin: '0 0 0.5rem', color: 'var(--text)' }}>
-            {'<CodeShare />'}
-          </h1>
-          <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '1rem' }}>
-            코드를 공유하고, 함께 성장하는 개발자 커뮤니티
-          </p>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚡</div>
+        <h1 style={{ fontSize: '3rem', fontWeight: 800, margin: '0 0 1rem', color: '#fff' }}>
+          CodeShare
+        </h1>
+        <p style={{ fontSize: '1.3rem', color: '#a5b4fc', marginBottom: '0.5rem' }}>
+          Share & Recommend & Follow & Talk
+        </p>
+        <p style={{ fontSize: '1rem', color: '#888', marginBottom: '3rem' }}>
+          with other users
+        </p>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Link href="/signup" style={{
+            background: '#6366f1', color: '#fff', padding: '14px 36px',
+            borderRadius: '8px', textDecoration: 'none', fontWeight: 700, fontSize: '1.1rem'
+          }}>
+            Sign Up
+          </Link>
+          <Link href="/login" style={{
+            background: 'transparent', color: '#fff', padding: '14px 36px',
+            borderRadius: '8px', textDecoration: 'none', fontWeight: 700, fontSize: '1.1rem',
+            border: '1px solid #6366f1'
+          }}>
+            Sign In
+          </Link>
         </div>
-        <button onClick={() => setShowFeatures(!showFeatures)} style={{
-          background: 'none', border: '1px solid var(--border)',
-          color: 'var(--text-muted)', padding: '8px 16px', borderRadius: '8px',
-          cursor: 'pointer', fontSize: '0.875rem'
-        }}>
-          {showFeatures ? '기능 숨기기 ▲' : '기능 보기 ▼'}
-        </button>
       </div>
 
-      {/* 기능 설명 */}
-      {showFeatures && (
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-          gap: '1rem', marginBottom: '2rem'
-        }}>
-          {FEATURES.map(f => (
-            <div key={f.title} style={{
-              background: 'var(--bg-card)', border: '1px solid var(--border)',
-              borderRadius: '12px', padding: '1.25rem'
-            }}>
-              <p style={{ margin: '0 0 8px', fontSize: '1.5rem' }}>{f.icon}</p>
-              <p style={{ margin: '0 0 6px', fontWeight: 600, color: 'var(--text)', fontSize: '0.95rem' }}>{f.title}</p>
-              <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.8rem', lineHeight: 1.5 }}>{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* 기능 카드 */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '4rem' }}>
+        {FEATURES.map(f => (
+          <div key={f.title} style={{
+            background: 'var(--bg-card)', border: '1px solid var(--border)',
+            borderRadius: '16px', padding: '2rem', textAlign: 'center'
+          }}>
+            <p style={{ fontSize: '2.5rem', margin: '0 0 1rem' }}>{f.icon}</p>
+            <p style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text)', margin: '0 0 8px' }}>{f.title}</p>
+            <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>{f.desc}</p>
+          </div>
+        ))}
+      </div>
 
-      {/* 최근 코드 */}
+      {/* 하단 CTA */}
+      <div style={{
+        textAlign: 'center', padding: '3rem',
+        background: 'var(--bg-card)', border: '1px solid var(--border)',
+        borderRadius: '16px'
+      }}>
+        <h2 style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text)', marginBottom: '1rem' }}>
+          지금 바로 시작하세요!
+        </h2>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
+          개발자들과 코드를 공유하고 함께 성장하세요
+        </p>
+        <Link href="/signup" style={{
+          background: '#6366f1', color: '#fff', padding: '14px 36px',
+          borderRadius: '8px', textDecoration: 'none', fontWeight: 700, fontSize: '1.1rem'
+        }}>
+          무료로 시작하기 →
+        </Link>
+      </div>
+    </div>
+  )
+
+  // 로그인 된 경우 피드
+  return (
+    <div>
       <div style={{ marginBottom: '1.5rem' }}>
         <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text)' }}>
           최근 공유된 코드
