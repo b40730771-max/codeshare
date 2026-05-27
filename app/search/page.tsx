@@ -5,7 +5,6 @@ import CodeCard from '@/components/CodeCard';
 import Link from 'next/link';
 
 const LANGUAGES = [
-  '전체',
   'javascript',
   'typescript',
   'python',
