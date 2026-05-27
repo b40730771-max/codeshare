@@ -27,7 +27,7 @@ const SLIDES = [
     icon: '🌿',
     title: '브랜치 & PR',
     subtitle: 'Branch & Pull Request',
-    desc: '브랜치로 새 기능을 개발하고 Pull Request로 코드 리뷰를 요청하세요. GitHub처럼 버전을 관리할 수 있어요.',
+    desc: '브랜치로 새 기능을 개발하고 Pull Request로 코드 리뷰를 요청하세요. 자신이 원하는 버전을 골라 그 버전을 관리할 수 있어요.',
     bg: 'linear-gradient(135deg, #134e5e 0%, #71b280 100%)',
     color: '#fbbf24'
   },
@@ -61,7 +61,7 @@ function Carousel({ showButtons }: { showButtons: boolean }) {
   }, [])
 
   return (
-    <div style={{ position: 'relative', marginBottom: '2rem' }}>
+    <div style={{ position: 'relative', marginBottom: '2rem', width: '100%' }}>
       <div style={{
         background: SLIDES[slide].bg,
         borderRadius: '20px',
@@ -221,7 +221,9 @@ export default function HomePage() {
                 background: lang === l ? '#6366f1' : 'var(--bg-card)',
                 color: lang === l ? '#fff' : 'var(--text-muted)',
                 border: '1px solid var(--border)',
-                padding: '6px 14px', borderRadius: '20px',
+                padding: '4rem 2rem',
+                width: '100%',
+                boxSizing: 'border-box' as const, borderRadius: '20px',
                 cursor: 'pointer', fontSize: '0.85rem'
               }}>{l}</button>
             ))}
